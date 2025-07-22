@@ -35,10 +35,6 @@
             </intent-filter>
 
         </activity>
-        <service
-            android:name=".ForegroundService"
-            android:exported="false"
-            android:foregroundServiceType="dataSync" />
     </application>
 
 </manifest>

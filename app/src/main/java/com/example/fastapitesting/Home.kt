@@ -66,11 +66,11 @@ fun Home(mainViewModel: MainViewModel,navController: NavController,modifier: Mod
     val bedTimeMinuite by mainViewModel.bedtimeMinuite.collectAsState()
     val isSwitchSelected by mainViewModel.isSwitchSelected.collectAsState()
     val context =LocalContext.current
-//    LaunchedEffect(Unit) {
-//        mainViewModel.GetPrefsPrevValue(context)
-//        val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>().build()
-//        WorkManager.getInstance(context).enqueue(workRequest)
-//    }
+    LaunchedEffect(Unit) {
+        mainViewModel.GetPrefsPrevValue(context)
+        val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>().build()
+        WorkManager.getInstance(context).enqueue(workRequest)
+    }
     Box(modifier=Modifier.fillMaxSize()){
 
         Column(
