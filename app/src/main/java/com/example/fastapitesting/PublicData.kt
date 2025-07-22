@@ -8,4 +8,5 @@ val SHARED_PREFS_FILENAME="myprefs"
 val HOUR_KEY="hour"
 val MINUITE_KEY="minuite"
 val TOGGLE_KEY="toggle"
+val CHANNEL_ID = "wifi_channel"
 
