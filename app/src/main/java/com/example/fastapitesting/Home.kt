@@ -3,9 +3,12 @@ package com.example.fastapitesting
 import android.R.attr.fontWeight
 import android.R.attr.text
 import android.annotation.SuppressLint
+import android.os.Build
 import android.util.Log
 import android.view.RoundedCorner
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -57,22 +60,36 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import java.util.jar.Manifest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(mainViewModel: MainViewModel,navController: NavController,modifier: Modifier= Modifier){
     var showTimePickerDialog by rememberSaveable { mutableStateOf(false) }
     val bedTimeHour by mainViewModel.bedtimeHour.collectAsState()
+    val context =LocalContext.current
+
     val bedTimeMinuite by mainViewModel.bedtimeMinuite.collectAsState()
     val isSwitchSelected by mainViewModel.isSwitchSelected.collectAsState()
-    val context =LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+
+            } else {
+                Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
     LaunchedEffect(Unit) {
         mainViewModel.GetPrefsPrevValue(context)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
         val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>().build()
         WorkManager.getInstance(context).enqueue(workRequest)
     }
     Box(modifier=Modifier.fillMaxSize()){
-
         Column(
             modifier=Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,

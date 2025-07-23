@@ -57,16 +57,12 @@ class BackgroundWorker(context: Context,workerParams: WorkerParameters): Corouti
             }
             else {
                 if (wifiManager.isWifiEnabled) {
+                    ShowNotification(applicationContext)
                     CoroutineScope(Dispatchers.Main).launch {
-                        Toast.makeText(
-                            applicationContext,
-                            "Wi-Fi is ON. Please turn it OFF.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
                     }
-                    wifiManager.isWifiEnabled = false
                     Log.d("general", "wifi is enabled bad boy")
+                    wifiManager.isWifiEnabled = false
+                    Log.d("general", "wifi is still enabled bad boy")
                 } else {
                     Log.d("general", "wifi is disabled good boy")
                 }
@@ -80,4 +76,31 @@ class BackgroundWorker(context: Context,workerParams: WorkerParameters): Corouti
         return Result.success()
     }
 
+}
+@RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+fun ShowNotification(context: Context){
+    val channelId = "channel_id"
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channel = NotificationChannel(
+            channelId,
+            "My Notifications",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Basic notification channel"
+        }
+
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(channel)
+    }
+
+    val notification = NotificationCompat.Builder(context, channelId)
+        .setSmallIcon(R.drawable.ic_dialog_alert)
+        .setContentTitle("Wifi Alert")
+        .setContentText("Shutting Down Wifi")
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setAutoCancel(true)
+        .build()
+
+    NotificationManagerCompat.from(context).notify(1001, notification)
 }
