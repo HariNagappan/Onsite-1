@@ -1,5 +1,6 @@
 package com.example.fastapitesting
 
+import android.R.id.edit
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.ContentView
@@ -23,9 +24,13 @@ class MainViewModel: ViewModel(){
     private var _bedtimeMinuite: MutableStateFlow<Int> = MutableStateFlow(30)
     var bedtimeHour: StateFlow<Int> = _bedtimeHour
     var bedtimeMinuite: StateFlow<Int> = _bedtimeMinuite
+    private var _sleepingHours: MutableStateFlow<Int> = MutableStateFlow(8)
+
+    val sleepingHours: StateFlow<Int> = _sleepingHours
 
     private var _isSwitchSelected: MutableStateFlow<Boolean> = MutableStateFlow(true)
     var isSwitchSelected: StateFlow<Boolean> = _isSwitchSelected
+
 
 
     fun SetBedtimeHour(newHour:Int){
@@ -34,6 +39,10 @@ class MainViewModel: ViewModel(){
     fun SetBedtimeMinuite(newMinuite:Int){
         _bedtimeMinuite.value=newMinuite
     }
+    fun SetSleepingHours(newSleepingHours:Int){
+        _sleepingHours.value=newSleepingHours
+    }
+
     fun ToggleSwitch(){
         _isSwitchSelected.value=!isSwitchSelected.value
     }
@@ -44,6 +53,7 @@ class MainViewModel: ViewModel(){
         edit.putInt(HOUR_KEY,_bedtimeHour.value)
         edit.putInt(MINUITE_KEY,_bedtimeMinuite.value)
         edit.putBoolean(TOGGLE_KEY,_isSwitchSelected.value)
+        edit.putInt(SLEEPING_TIME_KEY,_sleepingHours.value)
 
         edit.apply()
     }
@@ -52,5 +62,6 @@ class MainViewModel: ViewModel(){
         _bedtimeHour.value=prefs.getInt(HOUR_KEY,22)
         _bedtimeMinuite.value=prefs.getInt(MINUITE_KEY,30)
         _isSwitchSelected.value=prefs.getBoolean(TOGGLE_KEY,true)
+        _sleepingHours.value= prefs.getInt(SLEEPING_TIME_KEY,_sleepingHours.value)
     }
 }

@@ -35,11 +35,14 @@ import java.util.concurrent.TimeUnit
 class BackgroundWorker(context: Context,workerParams: WorkerParameters): CoroutineWorker(context,workerParams){
     var sleepHour=22
     var sleepMinuite=30
+    var sleepingHours=8
     var shouldOffWifi=true
     init{
         val prefs=context.getSharedPreferences(SHARED_PREFS_FILENAME,Context.MODE_PRIVATE)
         sleepHour=prefs.getInt(HOUR_KEY,22)
         sleepMinuite=prefs.getInt(MINUITE_KEY,30)
+        sleepingHours=prefs.getInt(SLEEPING_TIME_KEY,sleepingHours)
+
         shouldOffWifi=prefs.getBoolean(TOGGLE_KEY,true)
     }
 
@@ -52,7 +55,7 @@ class BackgroundWorker(context: Context,workerParams: WorkerParameters): Corouti
 
         if(curHour*60+curMinuite >=sleepHour*60 + sleepMinuite &&shouldOffWifi){
             val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-            if(curHour>sleepHour+8){
+            if(curHour>=sleepHour+sleepingHours && curMinuite-sleepMinuite>=0){
                 wifiManager.isWifiEnabled=true
             }
             else {
@@ -60,9 +63,7 @@ class BackgroundWorker(context: Context,workerParams: WorkerParameters): Corouti
                     ShowNotification(applicationContext)
                     CoroutineScope(Dispatchers.Main).launch {
                     }
-                    Log.d("general", "wifi is enabled bad boy")
                     wifiManager.isWifiEnabled = false
-                    Log.d("general", "wifi is still enabled bad boy")
                 } else {
                     Log.d("general", "wifi is disabled good boy")
                 }

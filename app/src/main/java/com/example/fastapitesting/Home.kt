@@ -1,11 +1,13 @@
 package com.example.fastapitesting
 
 import android.R.attr.fontWeight
+import android.R.attr.label
 import android.R.attr.text
 import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import android.view.RoundedCorner
+import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,6 +27,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation.Companion.keyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
@@ -39,6 +43,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,9 +59,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -68,7 +75,6 @@ fun Home(mainViewModel: MainViewModel,navController: NavController,modifier: Mod
     var showTimePickerDialog by rememberSaveable { mutableStateOf(false) }
     val bedTimeHour by mainViewModel.bedtimeHour.collectAsState()
     val context =LocalContext.current
-
     val bedTimeMinuite by mainViewModel.bedtimeMinuite.collectAsState()
     val isSwitchSelected by mainViewModel.isSwitchSelected.collectAsState()
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -119,6 +125,11 @@ fun Home(mainViewModel: MainViewModel,navController: NavController,modifier: Mod
                     )
                 }
             }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp),verticalAlignment = Alignment.CenterVertically) {
+                Text("Enter Sleeping Hours:")
+                MyNumberPicker(mainViewModel = mainViewModel)
+            }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp),verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "Disable wifi upon Reaching bedtime",
@@ -147,4 +158,24 @@ fun Home(mainViewModel: MainViewModel,navController: NavController,modifier: Mod
                 onDismiss = {showTimePickerDialog=false})
         }
     }
+}
+@Composable
+fun MyNumberPicker(mainViewModel: MainViewModel){
+    val sleepingHours by mainViewModel.sleepingHours.collectAsState()
+    val localContext=LocalContext.current
+    AndroidView(
+        factory = { context ->
+            NumberPicker(context).apply {
+                minValue = 0
+                maxValue = 12
+                value = sleepingHours
+                setOnValueChangedListener { _, _, newVal ->
+                    mainViewModel.SetSleepingHours(newVal)
+                    Log.d("SleepingHours","amount of sleeping hours:$newVal")
+                    mainViewModel.SaveToSharedPrefs(context=localContext)
+                }
+            }
+        }
+    )
+
 }
